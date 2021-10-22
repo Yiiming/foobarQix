@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'foobarqix';
+
+  public openKataFoobar() {
+    window.open('https://codingdojo.org/kata/FooBarQix/', '_blank');
+  }
 }
