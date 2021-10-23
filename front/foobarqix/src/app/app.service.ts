@@ -29,7 +29,7 @@ export class AppService {
       const response = tableDataSession.filter(data => data && data['step'] && data['step'] ? data['step'] === step : false);
       return response;
     } else {
-      return 'No data';
+      return [];
     }
   }
 
