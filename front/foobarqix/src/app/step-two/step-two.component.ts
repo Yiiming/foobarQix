@@ -53,8 +53,13 @@ export class StepTwoComponent implements OnInit {
   }
 
   public emptyHistory(): void {
-    this.stepOneService.emptyHistory();
-    this.isEmpty = true;
+    if (this.isDjango) {
+      this.stepOneService.deleteStepOne();
+      this.dataFromDjango = [];
+    } else {
+      this.stepOneService.emptyHistory();
+      this.isEmpty = true;
+    }
   }
 
   public reload(): void {
