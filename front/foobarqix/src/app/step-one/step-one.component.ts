@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { StepOneService } from './service/step-one.service';
 
 @Component({
@@ -9,10 +9,16 @@ import { StepOneService } from './service/step-one.service';
 export class StepOneComponent implements OnInit {
 
   public numberChosen: number = 0;
+  public numberChosenDjango: number = 0;
   readonly numberPattern = /^[0-9]*$/
   public resultFinal: string = '';
+  public resultFinalDjango: string = '';
   public isEmpty = false;
   public readonly step = 'one';
+  public isDjango = false;
+  public dataFromDjango = [];
+
+  @ViewChild("numbFormDjango") numbFormDjango!: any
 
   constructor(private stepOneService: StepOneService) { }
 
@@ -25,8 +31,20 @@ export class StepOneComponent implements OnInit {
    */
   public updateNumber(event: any): void {
     if (event && event.value !== undefined) {
-      this.resultFinal = this.stepOneService.sendUpdateNumber(event.value, this.step);
-      this.isEmpty = false;
+      const valData = event.value;
+      if (this.isDjango && this.stepOneService.controlPatternNumber(valData)) {
+        this.stepOneService.createStepOneDjango(valData).subscribe(
+          ({ data }) => {
+            if (data && data !== undefined) {
+              this.resultFinalDjango = data['createStep'] && data['createStep']['stringStep'] ? data['createStep']['stringStep'] : '';
+              this.reload();
+            }
+          }
+        )
+      } else {
+        this.resultFinal = this.stepOneService.sendUpdateNumber(valData, this.step);
+        this.isEmpty = false;
+      }
     }
   }
 
@@ -35,12 +53,30 @@ export class StepOneComponent implements OnInit {
   }
 
   public emptyHistory(): void {
-    this.stepOneService.emptyHistory();
-    this.isEmpty = true;
+    if (this.isDjango) {
+      this.stepOneService.deleteStepOne();
+      this.dataFromDjango = [];
+    } else {
+      this.stepOneService.emptyHistory();
+      this.isEmpty = true;
+    }
   }
 
-  public saveHistory(): void {
-    //return this.appService.emptyHistory();
+  public reload() {
+    if (this.isDjango) {
+      this.stepOneService.reloadData().subscribe(
+        ({ data }) => {
+          const dataList: [] = data["steps"];
+          this.dataFromDjango = dataList.filter(x => x['step'] === 'One');
+        }
+      )
+    }
+  }
+
+  public sendToDjango(event:any) {
+    if (this.numbFormDjango) {
+      this.updateNumber(this.numbFormDjango);
+    }
   }
 
 }

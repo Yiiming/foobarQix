@@ -1,6 +1,19 @@
 import { Injectable } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
+import { Observable } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { StepOneService } from 'src/app/step-one/service/step-one.service';
+
+const CREATE_POST = gql`
+	mutation CreateStepTwo($numbStep: Int!, $step: String!) {
+		createStepTwo(numberStep: $numbStep, step: $step) {
+			id
+			numberStep
+			stringStep
+			step
+		}
+	}
+`;
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +25,7 @@ export class StepTwoService {
   readonly strSeven = 'Qix';
   readonly asterik = '*';
 
-  constructor(private stepOneService: StepOneService, private appService: AppService) {
+  constructor(private stepOneService: StepOneService, private appService: AppService, private apollo: Apollo) {
 
   }
 
@@ -33,7 +46,6 @@ export class StepTwoService {
       if (resultFinal === '' || resultFinal === '*') {
         resultFinal = numberChosen.toString();
         resultFinal = resultFinal.replace('0', this.asterik);
-        console.log(numberChosen);
       }
       const dataSave = {
         number: numberChosen,
@@ -71,4 +83,18 @@ export class StepTwoService {
     )
     return res;
   }
+
+  public createStepTwoDjango(numb: number, step="Two"): Observable<any> {
+    return this.apollo.mutate(
+      {
+        mutation: CREATE_POST,
+        variables: {
+          numbStep: numb,
+          step: step
+        }
+      }
+    );
+  }
 }
+
+

@@ -9,42 +9,94 @@
 	<li>For each digit 3, 5, 7, add “Foo”, “Bar”, “Qix” in the digits order.</li>
 </ul>
 
-<div class="row">
-	<form class="col-12">
-		<div class="row">
-			<div class="form-group col-6 offset-3">
-				<label for="numbForm">Enter a number</label>
-				<input type="string" pattern="numberPattern" name="numbForm" #numbForm="ngModel" (input)="updateNumber($event.target)" [(ngModel)]="numberChosen" class="form-control" id="numbForm" aria-describedby="numberEnter">
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-6 offset-3">
-				<label>Result : </label>
-				<span style="background-color: yellow; margin-left: 10px;">{{ resultFinal }}</span>
-			</div>
-		</div>
-	</form>
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+	<label class="btn btn-light" [ngClass]="{ 'active': !isDjango }">
+		<input type="radio" name="options" (click)="isDjango = false" id="option1"> Angular
+	</label>
+	<label class="btn btn-light" [ngClass]="{ 'active': isDjango }">
+		<input type="radio" name="options" (click)="isDjango = true; reload()" id="option2"> Django
+	</label>
 </div>
 
-<div class="row">
-	<h3>History</h3>
-	
-	<div class="col-12">
-		<table class="table" *ngIf="!isEmpty">
-			<thead>
-			<tr>
-				<th scope="col">Number</th>
-				<th scope="col">Result</th>
-			</tr>
-			</thead>
-			<tbody>
-			<tr *ngFor="let data of historyStepOne()">
-				<td>{{ data.number }}</td>
-				<td>{{ data.result }}</td>
-			</tr>
-			</tbody>
-		</table>
+<ng-container *ngIf="isDjango">
+	<div class="row">
+		<form class="col-12" (submit)="sendToDjango($event)">
+			<div class="row">
+				<div class="form-group col-6 offset-3">
+					<label for="numbFormDjango">Enter a number for django</label>
+					<input type="string" pattern="numberPattern" name="numbFormDjango" #numbFormDjango="ngModel" [(ngModel)]="numberChosenDjango" class="form-control" id="numbForm" aria-describedby="numberEnter">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-6 offset-3">
+					<label>Result : </label>
+					<span style="background-color: yellow; margin-left: 10px;">{{ resultFinalDjango }}</span>
+				</div>
+			</div>
+			<input type="submit" class="col-4 offset-4 btn btn-primary" value="Subscribe">
+		</form>
 	</div>
-	<button (click)="emptyHistory()" class="btn btn-primary col-4 offset-1">Empty history</button>
-	<button (click)="saveHistory()" class="btn btn-primary col-4 offset-1">Save history</button>
-</div>
+
+	<div class="row">
+		<h3>History Django</h3>
+		
+		<div class="col-12">
+			<table class="table" *ngIf="dataFromDjango">
+				<thead>
+				<tr>
+					<th scope="col">Number</th>
+					<th scope="col">Result</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr *ngFor="let data of dataFromDjango">
+					<td>{{ data["numberStep"] }}</td>
+					<td>{{ data["stringStep"] }}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<button (click)="emptyHistory()" class="btn btn-primary col-4 offset-4">Empty history</button>
+	</div>
+</ng-container>
+
+<ng-container *ngIf="!isDjango">
+	<div class="row">
+		<form class="col-12">
+			<div class="row">
+				<div class="form-group col-6 offset-3">
+					<label for="numbForm">Enter a number</label>
+					<input type="string" pattern="numberPattern" name="numbForm" #numbForm="ngModel" (input)="updateNumber($event.target)" [(ngModel)]="numberChosen" class="form-control" id="numbForm" aria-describedby="numberEnter">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-6 offset-3">
+					<label>Result : </label>
+					<span style="background-color: yellow; margin-left: 10px;">{{ resultFinal }}</span>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div class="row">
+		<h3>History</h3>
+		
+		<div class="col-12">
+			<table class="table" *ngIf="!isEmpty">
+				<thead>
+				<tr>
+					<th scope="col">Number</th>
+					<th scope="col">Result</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr *ngFor="let data of historyStepOne()">
+					<td>{{ data.number }}</td>
+					<td>{{ data.result }}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<button (click)="emptyHistory()" class="btn btn-primary col-4 offset-4">Empty history</button>
+	</div>
+</ng-container>

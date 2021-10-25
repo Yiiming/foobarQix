@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { StepOneService } from '../step-one/service/step-one.service';
 import { StepTwoService } from './service/step-two.service';
 
@@ -14,6 +14,11 @@ export class StepTwoComponent implements OnInit {
   public resultFinal: string = '';
   public isEmpty = false;
   public readonly step = 'two';
+  public isDjango = false;
+  public dataFromDjango = [];
+  public resultFinalDjango = '';
+  public numberChosenDjango: number = 0
+  @ViewChild("numbFormDjango") numbFormDjango!: any
 
   constructor(private stepOneService: StepOneService, private stepTwoService: StepTwoService) { }
 
@@ -26,8 +31,20 @@ export class StepTwoComponent implements OnInit {
    */
   public updateNumber(event: any): void {
     if (event && event.value !== undefined) {
-      this.resultFinal = this.stepTwoService.sendUpdateNumber(event.value, this.step);
-      this.isEmpty = false;
+      const valData = event.value;
+      if (this.isDjango && this.stepOneService.controlPatternNumber(valData)) {
+        this.stepTwoService.createStepTwoDjango(valData).subscribe(
+          ({ data }) => {
+            if (data && data !== undefined) {
+              this.resultFinalDjango = data['createStep'] && data['createStep']['stringStep'] ? data['createStep']['stringStep'] : '';
+              this.reload();
+            }
+          }
+        )
+      } else {
+        this.resultFinal = this.stepTwoService.sendUpdateNumber(valData, this.step);
+        this.isEmpty = false;
+      }
     }
   }
 
@@ -40,8 +57,21 @@ export class StepTwoComponent implements OnInit {
     this.isEmpty = true;
   }
 
-  public saveHistory(): void {
-    //return this.appService.emptyHistory();
+  public reload(): void {
+    if (this.isDjango) {
+      this.stepOneService.reloadData().subscribe(
+        ({ data }) => {
+          const dataList: [] = data["steps"];
+          this.dataFromDjango = dataList.filter(x => x['step'] === 'Two');
+        }
+      )
+    }
+  }
+
+  public sendToDjango(event:any) {
+    if (this.numbFormDjango) {
+      this.updateNumber(this.numbFormDjango);
+    }
   }
 
 }

@@ -1,2 +1,6 @@
 /front/foobarqix/node_modules/*
 .DS_Store
+/back/foobarQix/foobarQix/__pycache__/*
+/back/foobarQix/stepOne/__init__.py
+/back/foobarQix/stepOne/__pycache__
+/back/foobarQix/stepOne/migrations/*

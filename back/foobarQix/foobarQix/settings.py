@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'stepOne',
+    'corsheaders',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -47,9 +50,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'foobarQix.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:4200',
+]
 
 TEMPLATES = [
     {
@@ -75,8 +84,8 @@ WSGI_APPLICATION = 'foobarQix.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'foobarQix',
     }
 }
 
@@ -113,6 +122,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+#AUTH_USER_MODEL = 'stepOne.CustomStepOne'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -123,3 +133,7 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+GRAPHENE = {
+    'SCHEMA': 'foobarQix.schema.schema',
+}

@@ -1,9 +1,41 @@
 import { Injectable } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
+import { Observable, Subscription } from 'rxjs';
 import { AppService } from '../../app.service';
+
+const CREATE_POST = gql`
+    mutation CreateStep($numbStep: Int!, $step: String!) {
+      createStep(numberStep: $numbStep, step: $step) {
+        id
+        numberStep
+        stringStep
+        step
+      }
+    }
+  `;
+
+const DELETE_POST = gql`
+  mutation DeleteStepOne {
+    deleteAllStep(stepData: "One") {
+      stepData
+    }
+  }
+`;
+
+const FIND_ALL = gql`
+query Step {
+  steps {
+    numberStep
+		stringStep
+		step
+  }
+}
+`;
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class StepOneService {
 
   public numberChosen: number = 0;
@@ -13,17 +45,23 @@ export class StepOneService {
   readonly strFive = 'Bar';
   readonly strSeven = 'Qix';
 
-  constructor(private appService: AppService) { }
+
+  constructor(private appService: AppService, private apollo: Apollo) { }
+
+
+  public controlPatternNumber(val: any) {
+    return this.numberPattern.test(val.toString());
+  }
 
   /**
    * Update number and resultFinal
    * @param event event
    */
   public sendUpdateNumber(val: number, step: string): string {
-    const controlNumb = this.numberPattern.test(val.toString());
+    
     let resultFinal = '';
     let numberChosen = val;
-    if (val && val !== undefined && controlNumb === true) {
+    if (val && val !== undefined && this.controlPatternNumber(val)) {
       
       resultFinal += this.divisibleThree(numberChosen);
       resultFinal += this.divisibleFive(numberChosen);
@@ -101,5 +139,33 @@ export class StepOneService {
 
   public saveHistory(): void {
     //return this.appService.emptyHistory();
+  }
+
+  public createStepOneDjango(numb: number, step="One"): Observable<any> {
+    return this.apollo.mutate(
+      {
+        mutation: CREATE_POST,
+        variables: {
+          numbStep: numb,
+          step: step
+        }
+      }
+    );
+  }
+
+  public deleteStepOne() {
+    this.apollo.mutate(
+      {
+        mutation: DELETE_POST
+      }
+    ).subscribe();
+  }
+
+  public reloadData(): Observable<any> {
+    return this.apollo.mutate(
+      {
+        mutation: FIND_ALL
+      }
+    )
   }
 }
